@@ -1,0 +1,102 @@
+<html>
+<head>
+<style>
+body {
+    font-family: sans-serif;
+}
+h1 {
+    text-align: center;
+    background-color: black;
+    color: white;
+    text-align: left;
+    padding: 15px;
+}
+td a {
+    color: red;
+    text-decoration: none;
+}
+p {
+    width: 500px;
+    margin: 20px auto;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+</style>
+</head>
+<body>
+<h1><img src="icon48.png" align="center"/>&nbsp;&nbsp;&nbsp;Auto Login Options</h1>
+
+<h4>
+    Display message while login page is being submitted?
+    <label><input type="radio" name="overlay" value="true">Yes</label>
+    <label><input type="radio" name="overlay" value="false">No</label>
+</h4>
+<script>
+// radio buttons
+var options = chrome.extension.getBackgroundPage().options;
+buttons = document.getElementsByTagName('input');
+if(options.overlay)
+    buttons[0].checked = true;
+else
+    buttons[1].checked = true;
+    
+function saveOptions()
+{
+    options.overlay = buttons[0].checked;
+    localStorage.setItem('options', JSON.stringify(options));
+}
+
+buttons[0].onclick = saveOptions;
+buttons[1].onclick = saveOptions;
+</script>
+
+<h2>Login pages to bypass</h2>
+<script>
+function removePage(element, key)
+{
+    row = element.parentElement.parentElement;
+    row.parentElement.removeChild(row);
+    localStorage.removeItem(key);
+    
+    if(localStorage.length == 1) // reload to show instructions if list empty
+        window.location=window.location;
+}
+// list of pages
+if(localStorage.length == 1) // there will always be options
+{
+    document.write('<p style="font-weight:bold">No sites are set for auto login yet.</p>');
+    document.write('<p>To add a site, navigate to the login page of a site which Chrome has saved the password for ');
+    document.write('and click the Auto Login icon that will appear next to the site\'s URL')
+}
+else
+{
+    document.write('<table border="1" cellspacing="0" cellpadding="3">');
+    document.write('<tr><th>Remove</th><th>Page Title</th><th>Page URL</th></tr>');    
+    for(i=0; i<localStorage.length; i++)
+    {
+        if(localStorage.key(i) == 'options')
+            continue;
+        
+        document.write('<tr>');
+        //document.write('<td align="center"><a href="javascript:localStorage.removeItem(\'' + localStorage.key(i) + '\');window.location=window.location;">X</a></td>');
+        document.write('<td align="center"><a href="#" onclick="removePage(this, \'' + localStorage.key(i) + '\');">X</a></td>');
+        document.write('<td>' + localStorage.getItem(localStorage.key(i)) + '</td><td><small>' + localStorage.key(i) + '</small></td>');
+        document.write('</tr>');
+    }
+    document.write('</table>');
+}
+</script>
+<p>&nbsp;</p>
+<p>
+    <b>Note:</b> your password must be saved by the browser to be automatically logged in.  
+    The <a href="https://chrome.google.com/extensions/detail/ecpgkdflcnofdbbkiggklcfmgbnbabhh">"Autocomplete = on"</a> extension can help
+    for pages that disallow saving your password.
+</p>
+<p>&nbsp;</p>
+<p>
+    Bugs? Feature requests? Praise? <a href="mailto:autologin@plaidweb.com">Tell me what you think</a>
+</p>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<html>
+<body>
+<script>
+// initialize options
+var options = {
+    'overlay' : true
+}
+
+// clean up bad data in localStorage from version 1.1
+if(localStorage.getItem('options') && localStorage.getItem('options') == '"options"')
+    localStorage.removeItem('options');
+
+if(o = localStorage.getItem('options'))
+    options = JSON.parse(o);
+else
+    localStorage.setItem('options', JSON.stringify(options));
+
+// add new tab listener
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
+{
+    if(tab.status == "complete")
+    {
+        if (localStorage.getItem(tab.url)) // if URL is in the list
+            chrome.tabs.sendRequest(tab.id, options);
+    }
+});
+
+
+// Respond to request to display "page action" icon from the content script
+chrome.extension.onRequest.addListener(
+    function(request, sender, sendResponse) 
+    {
+        if (request.showIcon) // if password field is present, present icon
+            chrome.pageAction.show(sender.tab.id);
+    }
+);
+
+
+// function to save page to localStorage.  called by the popup.
+function savePage() 
+{
+    chrome.tabs.getSelected(null, function(tab)
+    {
+        localStorage.setItem(tab.url, tab.title);
+        chrome.tabs.update(tab.id,{'url':tab.url});
+    });
+}
+
+// Preload image
+var img = document.createElement('img');
+img.src = chrome.extension.getURL("overlay.png");
+</script>
+</body>
+</html>
