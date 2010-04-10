@@ -1,0 +1,21 @@
+{
+  "name": "Auto Login",
+  "version": "1.3.1",
+  "description": "Why not skip the login page? Automatically logs you into sites that Chrome has a saved password for.",
+  "page_action": {
+    "default_icon": "icon19.png",
+    "default_title": "Log in to this page automatically.",
+    "popup": "popup.html"
+  },
+  "icons": {"19":"icon19.png", "48":"icon48.png", "128":"icon128.png"},
+  "background_page": "main.html",
+  "options_page": "options.html",
+  "permissions": ["tabs"],
+  "content_scripts": [
+    {
+      "js": ["contentScript.js"],
+      "css": ["overlay.css"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ]
+}
