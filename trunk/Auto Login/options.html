@@ -4,12 +4,18 @@
 body {
     font-family: sans-serif;
 }
-h1 {
+#header {
     text-align: center;
     background-color: black;
     color: white;
     text-align: left;
-    padding: 15px;
+}
+h1, h3 {
+    padding: 10px;
+    margin: 0px;
+}
+h3 {
+    text-align: right;
 }
 td a {
     color: red;
@@ -26,30 +32,40 @@ table {
 </style>
 </head>
 <body>
-<h1><img src="icon48.png" align="center"/>&nbsp;&nbsp;&nbsp;Auto Login Options</h1>
+<table id="header"><tr>
+    <td valign="middle"><h1><img src="icon48.png" align="center"/>&nbsp;&nbsp;&nbsp;Auto Login Options</h1></td>
+    <td valign="middle"><h3>(close this tab to save)</h3></td>
+</tr></table>
 
 <h4>
     Display message while login page is being submitted?
     <label><input type="radio" name="overlay" value="true">Yes</label>
     <label><input type="radio" name="overlay" value="false">No</label>
 </h4>
+<h4>
+    <label>Seconds to wait before auto submitting 
+        (only active if message is displayed)&nbsp; <input type="text" name="wait" value="0" size="1"></label>
+</h4>
+
 <script>
 // radio buttons
 var options = chrome.extension.getBackgroundPage().options;
 buttons = document.getElementsByTagName('input');
-if(options.overlay)
+if(options.overlay) {
     buttons[0].checked = true;
-else
+} else {
     buttons[1].checked = true;
-    
+}
+buttons[2].value = options.wait;
+
 function saveOptions()
 {
     options.overlay = buttons[0].checked;
+    options.wait = buttons[2].value;
     localStorage.setItem('options', JSON.stringify(options));
 }
 
-buttons[0].onclick = saveOptions;
-buttons[1].onclick = saveOptions;
+window.onunload = saveOptions;
 </script>
 
 <h2>Login pages to bypass</h2>
