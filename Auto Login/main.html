@@ -2,8 +2,9 @@
 <body>
 <script>
 // initialize options
-var options = {
-    'overlay' : true
+defaultOptions = {
+    'overlay' : true,
+    'wait' : 0
 }
 
 // clean up bad data in localStorage from version 1.1
@@ -11,16 +12,24 @@ if(localStorage.getItem('options') && localStorage.getItem('options') == '"optio
     localStorage.removeItem('options');
 
 if(o = localStorage.getItem('options'))
+{
     options = JSON.parse(o);
-else
-    localStorage.setItem('options', JSON.stringify(options));
 
+    if(!options.overlay)
+        options.overlay = defaultOptions.overlay;
+    if(!options.wait)
+        options.wait = defaultOptions.wait;
+}
+else
+{
+    localStorage.setItem('options', JSON.stringify(defaultOptions));        
+}
 // add new tab listener
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
 {
     if(tab.status == "complete")
     {
-        if (localStorage.getItem(tab.url)) // if URL is in the list
+        if (localStorage.getItem(tab.url)) // if URL is in the list, send a request
             chrome.tabs.sendRequest(tab.id, options);
     }
 });
@@ -46,9 +55,6 @@ function savePage()
     });
 }
 
-// Preload image
-var img = document.createElement('img');
-img.src = chrome.extension.getURL("overlay.png");
 </script>
 </body>
 </html>

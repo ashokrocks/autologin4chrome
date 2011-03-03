@@ -1,6 +1,5 @@
-// Preload image
-//var img = document.createElement('img');
-//img.src = chrome.extension.getURL("overlay.png");
+// Variable to keep track of if autologin has been stopped
+stopped = false
 
 // Helper function
 function findFirstFilledOutPasswordInput()
@@ -47,28 +46,41 @@ function findFirstFilledOutPasswordInput()
 chrome.extension.onRequest.addListener(
     function(request, sender, sendResponse) 
     {           
-        input = findFirstFilledOutPasswordInput();
+        if(!stopped)
+        {
+            input = findFirstFilledOutPasswordInput();
         
-        // submit form
-        if(input)
-        {                
-            if(request.overlay) // display cool graphic
-            {
-                var overlay = document.createElement('div');
-                overlay.setAttribute('id','AutoLoginOverlay');
-                overlay.style.height = document.height + 'px'; 
-                //var img = document.createElement('img');
-                //img.src = chrome.extension.getURL("overlay.png");
-                //img.style.marginTop = ((window.innerHeight/2) - (256/2)) + 'px';
-                //overlay.appendChild(img);
-                h1 = document.createElement('h1');
-                h1.innerText = 'Logging in...';
-                h1.style.marginTop = ((window.innerHeight/2) - (50/2)) + 'px';
-                overlay.appendChild(h1);
-                document.body.appendChild(overlay);
-            }
+            // submit form
+            if(input)
+            {                
+                if(request.overlay) // display cool graphic
+                {
+                    var overlay = document.createElement('div');
+                    overlay.setAttribute('id','AutoLoginOverlay');
+                    //overlay.style.height = window.innerHeight + 'px'; 
+                    document.body.appendChild(overlay);
                 
-            input.form.submit();
+                    h1 = document.createElement('h1');
+                    h1.innerText = 'Logging in...';
+                    h1.style.marginTop = ((window.innerHeight/2) - (150/2)) + 'px';
+                    overlay.appendChild(h1);
+                
+                    var h2 = document.createElement('h2');
+                    h2.innerText = "Cancel";
+                    h2.onclick = function() {
+                        window.stop();
+                        stopped = true;
+                        document.body.removeChild(overlay);
+                    };
+                    overlay.appendChild(h2);
+                    
+                    setTimeout(function(){if(!stopped) input.form.submit()}, request.wait*1000);
+                }
+                else
+                {
+                    input.form.submit();
+                }
+            }
         }
     }
 );
