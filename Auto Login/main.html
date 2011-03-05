@@ -25,12 +25,30 @@ else
     localStorage.setItem('options', JSON.stringify(defaultOptions));        
 }
 // add new tab listener
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
-{
-    if(tab.status == "complete")
-    {
-        if (localStorage.getItem(tab.url)) // if URL is in the list, send a request
-            chrome.tabs.sendRequest(tab.id, options);
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    if (tab.status == "complete") {
+        for (i = 0; i < localStorage.length; i++) 
+        {
+            url = localStorage.key(i);
+
+            if (url.indexOf("*") > -1) 
+            {
+                url = url.split('*')[0];
+                if (tab.url.indexOf(url) == 0) // if the tab URL starts with the wildcarded URL, request log in
+                {
+                    chrome.tabs.sendRequest(tab.id, options);
+                    break;
+                }
+            }
+            else 
+            {
+                if (url == tab.url) // if URL is in the list, send a request to log in
+                {
+                    chrome.tabs.sendRequest(tab.id, options);
+                    break;
+                }
+            }
+        }
     }
 });
 
