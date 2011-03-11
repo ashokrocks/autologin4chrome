@@ -1,0 +1,20 @@
+<html>
+    <body>
+	    <h1>Javascript onsubmit</h1>
+	    <form onSubmit="javascript:return crap();">
+            <input id="input" type="text" value="true" />
+		    <input type="password" value="asdf" />
+			<input id="status" />
+	    </form>
+		<script>
+            document.forms[0].onsubmit = function ()
+            {	
+				alert('javacript defined function');
+				doSubmit = crap();
+				document.getElementById('status').value = doSubmit;
+                return doSubmit;
+            };
+			function crap(){ return document.getElementById('input').value == 'true' }
+        </script>
+    </body>
+</html>

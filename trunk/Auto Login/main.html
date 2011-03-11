@@ -22,6 +22,7 @@ if(o = localStorage.getItem('options'))
 }
 else
 {
+    options = defaultOptions;
     localStorage.setItem('options', JSON.stringify(defaultOptions));        
 }
 // add new tab listener
